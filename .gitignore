@@ -1,0 +1,38 @@
+# Virtual Environment
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Environment variables (SECRETS - never commit!)
+.env
+
+# Database
+*.db
+
+# ChromaDB data
+chroma_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Uploads
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
