@@ -8,41 +8,27 @@ from sqlalchemy import pool
 from alembic import context
 
 # ============================================
-# IMPORTANT: Import our database Base and ALL models
+# Import our database Base and ALL models
 # ============================================
-# Alembic needs to know about our models to create migrations.
-# If you don't import a model here, Alembic won't create
-# its table!
-#
-# We'll uncomment these imports in Step 3 when we create the models.
-# For now, just import Base.
-# ============================================
-
 from app.database import Base
 
-# We'll add these in Step 3:
-# from app.models.user import User
-# from app.models.document import Document, Conversation
+# NOW these imports will work because we created the models!
+from app.models.user import User
+from app.models.document import Document, Conversation
 
 # ============================================
 # Alembic Config
 # ============================================
 config = context.config
 
-# Setup logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Tell Alembic about our tables
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
-    
-    Generates SQL without connecting to database.
-    Useful for reviewing SQL before running it.
-    """
+    """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -56,11 +42,7 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-    
-    Connects to database and runs migrations directly.
-    This is the normal mode.
-    """
+    """Run migrations in 'online' mode."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
