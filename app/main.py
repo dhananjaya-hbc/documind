@@ -5,15 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 import sys
 
-from app.api import auth
+from app.api import auth, documents, chat     # ← Added!
 from app.config import get_settings
 
 settings = get_settings()
 
-# ============================================
-# CONFIGURE LOGGING
-# ============================================
-logger.remove()      # Remove default logger
+logger.remove()
 logger.add(
     sys.stdout,
     format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
@@ -23,28 +20,14 @@ logger.add(
     level="INFO",
 )
 
-# ============================================
-# CREATE FASTAPI APP
-# ============================================
 app = FastAPI(
     title=settings.APP_NAME,
     description="AI-powered document Q&A platform",
     version="1.0.0",
-    docs_url="/docs",       # Swagger UI at /docs
-    redoc_url="/redoc",     # ReDoc at /redoc
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-# ============================================
-# CORS MIDDLEWARE
-# ============================================
-#
-# CORS = Cross-Origin Resource Sharing
-# This allows frontends (React, etc.) on different
-# domains to talk to our API.
-#
-# allow_origins=["*"] means "allow everyone"
-# In production, you'd restrict this to your frontend URL.
-#
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -53,33 +36,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ============================================
-# INCLUDE ROUTERS
-# ============================================
-#
-# Each router handles a group of endpoints:
-#   auth router → /api/v1/auth/register, /login, /me
-#   (we'll add more routers in later steps)
-#
+# Include ALL routers
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(documents.router, prefix="/api/v1")    # ← Added!
+app.include_router(chat.router, prefix="/api/v1")          # ← Added!
 
-
-# ============================================
-# ROOT ENDPOINTS
-# ============================================
 
 @app.get("/")
 async def root():
-    """Root endpoint — shows app info."""
     return {
         "app": settings.APP_NAME,
         "version": "1.0.0",
         "docs": "/docs",
-        "message": "Welcome to DocuMind API! Visit /docs for documentation.",
     }
 
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint — used by monitoring tools."""
     return {"status": "healthy"}
