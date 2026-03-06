@@ -1,25 +1,28 @@
 # alembic/env.py
 
 from logging.config import fileConfig
+import os
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
-# ============================================
-# Import our database Base and ALL models
-# ============================================
 from app.database import Base
-
-# NOW these imports will work because we created the models!
 from app.models.user import User
 from app.models.document import Document, Conversation
 
-# ============================================
-# Alembic Config
-# ============================================
 config = context.config
+
+# ============================================
+# Override URL from environment variable if available
+# This lets it work in Docker AND locally
+# ============================================
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    # Convert async URL to sync URL for Alembic
+    sync_url = database_url.replace("+asyncpg", "")
+    config.set_main_option("sqlalchemy.url", sync_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -28,7 +31,6 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -42,7 +44,6 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
